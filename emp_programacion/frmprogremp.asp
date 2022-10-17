@@ -16,7 +16,7 @@ dim valor_curso
 	'if(rs("MUTUAL")="807")then
 		'valor_curso="CURRICULO.VALOR_AFILIADOS as VALOR"
 	'else
-		valor_curso=" (CASE WHEN PROGRAMA.tipoValor = 0 then PROGRAMA.VALOR_ESPECIAL else  round(PROGRAMA.VALOR_ESPECIAL * (select top 1 ValorUF from UF_Diaria where day(FechaValor) = day(getdate() -1) and month(FechaValor) = month(getdate()) and year(FechaValor) = year(getdate())),0) end) as VALOR"	
+		valor_curso=" PROGRAMA.VALOR_ESPECIAL as VALOR"	
 	'end if
 
 dim query
