@@ -125,6 +125,21 @@ $(document).ready(function(){
 				}
 			}
 		});
+		$("#dialog_ms2").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 130,
+			width: 600,
+			modal: true,
+			buttons: {
+				'Aceptar': function() {
+					$(this).dialog('close');						
+				},
+				Cancelar: function() {
+					$(this).dialog('close');
+				}
+			}
+		});
 	
       $("#sendConf").dialog({
 			autoOpen: false,
@@ -526,21 +541,15 @@ $(document).ready(function(){
 		//window.open("libroventas/listar.asp?empresa="+$('#EmprBuscar').val()+"&selMes="+$('#SelMes').val()+"&selAno="+$('#selAno').val())
 		if(!cargada){
 		jQuery("#list1").jqGrid({ 
-		url:'finanzasEDP/listar.asp?empresa=&selMes=<%=cdbl(month(now))%>&selAno=<%=cdbl(year(now))%>&SelEst=&txDoc=', 
+		url:'finanzasEDP/listar.asp?empresa=&selMes=<%=cdbl(month(now))%>&selAno=<%=cdbl(year(now))%>', 
 		datatype: "xml", 
-		colNames:['Guia','Fecha', 'Rut', 'Nombre de Empresa', 'N° Factura', 'Estado','&nbsp;','&nbsp;','&nbsp;','&nbsp;','&nbsp;'], 
+		colNames:['ID_AUTORIZACION','Fecha', 'Rut', 'Nombre de Empresa','&nbsp;'], 
 		colModel:[
-				   {name:'Guia',index:'id_factura', width:22, align:'center'}, 		
+				   {name:'ID_AUTORIZACION',index:'ID_AUTORIZACION', width:22, align:'center', hidden:true}, 		
 				   {name:'Fecha',index:'FECHA', width:37, align:'center'}, 
 				   {name:'Rut',index:'ruts', width:42, align:'right'}, 
 				   {name:'Empresa',index:'R_SOCIAL'}, 
-				   {name:'Factura',index:'FACTURA', width:22, align:"right"},	
-				   {name:'Estado',index:'Estado', width:29, align:'center'},
-				   {align:"right",editable:true, width:10},
-				   {align:"right",editable:true, width:10},
-				   {align:"right",editable:true, width:10},
-				   {align:"right",editable:true, width:10},				   
-				   {align:"right",editable:true, width:8}
+				   {align:"right",editable:true, width:10}
 			], 
 		rowNum:300, 
 		autowidth: true, 
@@ -549,6 +558,7 @@ $(document).ready(function(){
 		sortname: 'FECHA', 
 		viewrecords: true, 
 		sortorder: "DESC", 
+		multiselect: true,
 		caption:"Listado de Pagos Pendientes" 
 		}); 
 	
@@ -565,7 +575,7 @@ $(document).ready(function(){
 														document.getElementById("SelMes").selectedIndex = 0;
 														document.getElementById("selAno").selectedIndex = 0;
 														
-jQuery("#list1").jqGrid('setGridParam',{url:"finanzasEDP/listar.asp?empresa=&selMes=0&selAno=<%=cdbl(year(now))%>&SelEst=&txDoc="}).trigger("reloadGrid")
+jQuery("#list1").jqGrid('setGridParam',{url:"finanzasEDP/listar.asp?empresa=&selMes=0&selAno=<%=cdbl(year(now))%>"}).trigger("reloadGrid")
 													  } });
 													  
 	
@@ -573,7 +583,31 @@ jQuery("#list1").jqGrid('setGridParam',{url:"finanzasEDP/listar.asp?empresa=&sel
 													  title:"Detalle EDP", 
 													  buttonicon :'ui-icon-script', 
 													  onClickButton:function(){ 
-													  DescargarExcel()
+													  var s;
+													  var acumulado = '';
+													 
+														s = jQuery("#list1").jqGrid('getGridParam','selarrrow');
+														
+														var ret = jQuery("#list1").jqGrid('getRowData',s[0]); 
+														//alert(ret.CODIGO);
+
+														for(var i=0;i<s.length;i++){		
+															var ret = jQuery("#list1").jqGrid('getRowData',s[i]); 
+															if(i == 0){
+																acumulado = ret.ID_AUTORIZACION;
+															
+															}else{
+															 acumulado = acumulado + ', '+ ret.ID_AUTORIZACION  ;
+																acumulado = acumulado.replace('undefined', '')	;
+															}	
+															
+														}
+														//console.log(acumulado);
+														if(acumulado != ''){
+															DescargarExcel(acumulado);
+														}else{
+															$('#dialog_ms2').dialog('open');
+														}
 														//	window.open("finanzasEDP/xls_detalle_EDP.asp?m="+$('#SelMes').val()+"&a="+$('#selAno').val()+"&e="+$('#EmprBuscar').val(),'Detalle EDP')													
 													  } });		
 jQuery("#list1").jqGrid('navButtonAdd',"#pager1",{caption:"Ingresar OC",
@@ -581,12 +615,39 @@ jQuery("#list1").jqGrid('navButtonAdd',"#pager1",{caption:"Ingresar OC",
 													  buttonicon :'ui-icon-script', 
 													  onClickButton:function(){ 
 																if($('#EmprBuscar').val() != ""){
-															     $.post("finanzasEDP/frmOrdenCompra.asp?empresa="+$('#EmprBuscar').val()+"&selMes="+$('#SelMes').val()+"&selAno="+$('#selAno').val()+"&SelEst="+$('#SelEst').val()+"&txDoc="+$('#txDoc').val(),
+																var s;
+																var acumulado = '';
+													 
+																	s = jQuery("#list1").jqGrid('getGridParam','selarrrow');
+														
+																	var ret = jQuery("#list1").jqGrid('getRowData',s[0]); 
+																	//alert(ret.CODIGO);
+
+																		for(var i=0;i<s.length;i++){		
+																		var ret = jQuery("#list1").jqGrid('getRowData',s[i]); 
+																	if(i == 0){
+																		acumulado = ret.ID_AUTORIZACION;
+															
+																		}else{
+																		acumulado = acumulado + ', '+ ret.ID_AUTORIZACION  ;
+																		acumulado = acumulado.replace('undefined', '')	;
+																		}	
+															
+																	}
+														//console.log(acumulado);
+																	if(acumulado != ''){
+																		$.post("finanzasEDP/frmOrdenCompra.asp?empresa="+$('#EmprBuscar').val()+"&selMes="+$('#SelMes').val()+"&selAno="+$('#selAno').val()+"&Auto="+acumulado,
 																	   function(f){
 																		   $('#dialog_OC').html(f);
 															
 																			$('#dialog_OC').dialog('open')
-																})
+																
+																		})
+																		}else{
+																		$('#dialog_ms2').dialog('open');
+																		}
+															     
+																 
 																}else{
 																	$('#dialog_ms').dialog('open');
 																}
@@ -596,7 +657,7 @@ jQuery("#list1").jqGrid('navButtonAdd',"#pager1",{caption:"Ingresar OC",
 		}
 		else
 		{
-jQuery("#list1").jqGrid('setGridParam',{url:"finanzasEDP/listar.asp?empresa="+$('#EmprBuscar').val()+"&selMes="+$('#SelMes').val()+"&selAno="+$('#selAno').val()+"&SelEst="+$('#SelEst').val()+"&txDoc="+$('#txDoc').val()}).trigger("reloadGrid")
+jQuery("#list1").jqGrid('setGridParam',{url:"finanzasEDP/listar.asp?empresa="+$('#EmprBuscar').val()+"&selMes="+$('#SelMes').val()+"&selAno="+$('#selAno').val()}).trigger("reloadGrid")
 		}
 	}		
 	
@@ -680,10 +741,10 @@ jQuery("#list1").jqGrid('setGridParam',{url:"finanzasEDP/listar.asp?empresa="+$(
 		}
 	});
     }	
-	function DescargarExcel() {
+	function DescargarExcel(listadoAutorizacion) {
 		var idEmpresa = $('#EmprBuscar').val();
 		if (idEmpresa != ""){
-			window.open("finanzasEDP/xls_detalle_EDP.asp?m="+$('#SelMes').val()+"&a="+$('#selAno').val()+"&e="+$('#EmprBuscar').val(),'Detalle EDP');
+			window.open("finanzasEDP/xls_detalle_EDP.asp?m="+$('#SelMes').val()+"&a="+$('#selAno').val()+"&e="+$('#EmprBuscar').val()+"&Auto="+listadoAutorizacion,'Detalle EDP');
 		}
 		else {
 			$('#dialog_ms').dialog('open');
@@ -838,8 +899,29 @@ sql="select PERMISO1,PERMISO2,PERMISO3,PERMISO4,PERMISO6,PERMISO7,PERMISO8,PERMI
                     <option value="12" <%if(cdbl(month(now))=12)then%>selected="selected"<%end if%>>Diciembre</option>
                   </select></td>
                 <td>&nbsp;</td>
-                <td>Buscar N° Doc:</td>
-                <td><input id="txDoc" name="txDoc" type="text" tabindex="1" maxlength="20" size="20" onkeyup="tabla();"/></td>
+               
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
               </tr>
               <tr>
                 <td>Año de Emisión:</td>
@@ -854,13 +936,7 @@ sql="select PERMISO1,PERMISO2,PERMISO3,PERMISO4,PERMISO6,PERMISO7,PERMISO8,PERMI
                                             %>
                 </select></td>
  				<td>&nbsp;</td>
-                <td>Estado:</td>
-                <td><select id="SelEst" name="SelEst" tabindex="3" onchange="tabla();">
-                    <option value="" selected="selected">Todos</option>
-                    <option value="0">Anuladas</option>
-                    <option value="1">Vigentes</option>
-                    <option value="2">Refacturadas</option>
-                  </select></td>                
+                              
               </tr>              
             </table>
             <br>            
@@ -899,6 +975,9 @@ sql="select PERMISO1,PERMISO2,PERMISO3,PERMISO4,PERMISO6,PERMISO7,PERMISO8,PERMI
 </div>
 <div id="dialog_ms" title="Advertencia">
 	<p>Necesita ingresar el rut de la empresa para continuar</p>
+</div>
+<div id="dialog_ms2" title="Advertencia">
+	<p>Necesita seleccionar alguna factura</p>
 </div>
 </body>
 </html>

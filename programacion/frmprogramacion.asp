@@ -9,6 +9,25 @@ vid = Request("id")
 
 vUser=0
 if(request("u")<>"")then vUser=request("u") end if
+dim uf
+
+  uf=" if EXISTS (select ValorUF from UF_Diaria where  month(FechaValor) = month (getdate()) and year(FechaValor) = year (getdate()) and day(FechaValor) = day (getdate())) "
+  uf= uf&"begin "
+  uf= uf&"select ValorUF from UF_Diaria "
+  uf= uf&"where  month(FechaValor) = month (getdate()) "
+  uf= uf&"and year(FechaValor) = year (getdate()) "
+  uf= uf&"and day(FechaValor) = day (getdate()) "
+  uf= uf&"end "
+  uf= uf&"else "
+  uf= uf&"begin "
+   uf= uf&" select ValorUF from UF_Diaria "
+  uf= uf&"where  month(FechaValor) = month (getdate()) "
+  uf= uf&"and year(FechaValor) = year (getdate()) "
+  uf= uf&"and day(FechaValor) = day (getdate()-1) "
+  uf= uf&"end "
+  
+
+set rsUF = conn.execute(uf)
 
 dim query
 query="select ID_PROGRAMA,ID_MUTUAL,ID_INSTRUCTOR,ID_SEDE,SENCE,TIPO,"
@@ -16,11 +35,11 @@ query= query&"CONVERT(VARCHAR(10),FECHA_APERTURA, 105) as FECHA_APERTURA,"
 query= query&"CONVERT(VARCHAR(10),FECHA_CIERRE, 105) as FECHA_CIERRE,"
 query= query&"CONVERT(VARCHAR(10),FECHA_INICIO_, 105) as FECHA_INICIO_,"
 query= query&"CONVERT(VARCHAR(10),FECHA_TERMINO, 105) as FECHA_TERMINO,VALOR,CUPOS,INSCRITOS"
-query= query&",VACANTES,ESTADO,ID_EMPRESA,DIR_EJEC,VALOR_ESPECIAL,MONTO_TOTAL,"
+query= query&",VACANTES,ESTADO,ID_EMPRESA,DIR_EJEC,VALOR_ESPECIAL,MONTO_TOTAL, ValorUF, "
 query= query&"(CASE WHEN PROGRAMA.TIPO =  1 or PROGRAMA.TIPO =  3 THEN (select RUT from EMPRESAS where ID_EMPRESA=PROGRAMA.ID_EMPRESA) "
 query= query&"WHEN PROGRAMA.TIPO =  2 THEN '' END)as rut_Empresa,"
 query= query&"(CASE WHEN PROGRAMA.TIPO =  1 or PROGRAMA.TIPO =  3 THEN (select R_SOCIAL from EMPRESAS where ID_EMPRESA=PROGRAMA.ID_EMPRESA)"
-query= query&"WHEN PROGRAMA.TIPO =  2 THEN '' END)as Nom_Empresa,BMI,BMF,BTI,BTF,ID_Modalidad,ID_ZOOM, "
+query= query&"WHEN PROGRAMA.TIPO =  2 THEN '' END)as Nom_Empresa,BMI,BMF,BTI,BTF,ID_Modalidad,ID_ZOOM, tipoValor, "
 query= query&"usr=ISNULL((select 'Coordinado por '+u.NOMBRES+' '+u.A_PATERNO+' '+u.A_MATERNO from usuarios u where u.ID_USUARIO=PROGRAMA.USUARIO_CREA),'') "
 query= query&" from PROGRAMA where ID_PROGRAMA="&vid
 
@@ -35,7 +54,8 @@ fecha = vid
        <td>C&oacute;digo Curso :</td>
        <td><select id="Curriculo" name="Curriculo" tabindex="1" onchange="cargaDatos(this.value);"></select></td>
        <td><input type="hidden" id="txtId" name="txtId" value="<%=rsEmp("ID_PROGRAMA")%>"  /><input type="hidden" id="txtIdCurriculo" name="txtIdCurriculo" value="<%=rsEmp("ID_MUTUAL")%>" /></td>
-       <td>Nombre :</td>
+		<td><input type="hidden" id="txtVlUfActual" name="txtVlUfActual" value="<%=rsUF("ValorUF")%>"  />
+	   <td>Nombre :</td>
        <td colspan="4"><label id="txtCurso" name="txtCurso"></label></td>
      </tr>
      <tr>
@@ -84,12 +104,53 @@ fecha = vid
        <td>Direcci&oacute;n :</td>
        <td><input id="txLugar" name="txLugar" type="text" tabindex="11" maxlength="50" size="30" value="<%=rsEmp("DIR_EJEC")%>"/></td>
      </tr>
+	 <tr>
+	 <td id="tdlabTipoVa">Tipo de Cobro:</td>
+	 <td id="tdTipoValor">
+	   <select id="selectTValor" name="selectTValor" tabindex="12"  size="1" onchange="MostrarValorUF()">
+	   <%
+	   if rsEmp("tipoValor") = 0 then
+	   %>
+		<option value="0" selected>Pesos</option>
+		<Option value="1">UF </option>
+	   <%
+		else
+	   %>
+	   <option value="0" >Pesos</option>
+		<Option value="1" selected>UF </option>
+	   <%
+	   end if
+	   %>
+	   </select>
+	   </td>
+	   
+	   
+	   <%
+	   if rsEmp("tipoValor") = 0 then
+	   %>
+	   <td id="ContentUF" name="ContentUF" > 
+	     <td id="tdlabTipoVaUF" style="display:none">Cantidad UF:</td>
+		 <td><input id="txtValUF" name="txtValUF" type="text" tabindex="12" maxlength="50" size="12" value="<%=rsEmp("ValorUF")%>" style="display:none" onchange="CalcularPrecioUF()"/></td>
+	
+	  </td>
+	   <%
+		else
+	   %>
+		<td id="ContentUF" name="ContentUF"> 
+		  <td id="tdlabTipoVaUF">Cantidad UF:</td>
+		  <td><input id="txtValUF" name="txtValUF" type="text" tabindex="12" maxlength="50" size="12" value="<%=rsEmp("ValorUF")%>" onchange="CalcularPrecioUF()"/></td>
+	    </td>
+	   <%
+	    end if
+	   %>
+		
+	 </tr>
      <tr>
        <td><label id="labValor" name="labValor">Valor :</label></td>
        <td><label id="txtValor" name="txtValor">&nbsp;</label></td>
        <td>&nbsp;</td>       
        <td id="tdLabValEsp">Valor Especial:</td>
-       <td id="tdValEsp"><input id="txtValEsp" name="txtValEsp" type="text" tabindex="12" maxlength="50" size="12" value="<%=rsEmp("VALOR_ESPECIAL")%>"/></td>      
+       <td id="tdValEsp"><input id="txtValEsp" name="txtValEsp" type="text" tabindex="12" maxlength="50" size="12" value="<%=rsEmp("VALOR_ESPECIAL")%>"/></td> 
        <td id="tdLabValTot">Monto Total:</td>
        <td id="tdValTot"><input id="txtValTot" name="txtValTot" type="text" tabindex="12" maxlength="50" size="12" value="<%=rsEmp("MONTO_TOTAL")%>"/></td>           
      </tr>
@@ -145,6 +206,7 @@ fecha = vid
      <tr>
        <td>C&oacute;digo Curso :</td>
        <td><select id="Curriculo" name="Curriculo" tabindex="1" onchange="cargaDatos(this.value);"></select></td>
+	   <td><input type="hidden" id="txtVlUfActual" name="txtVlUfActual" value="<%=rsUF("ValorUF")%>"  />
        <td></td>
        <td>Nombre :</td>
        <td colspan="4"><label id="txtCurso" name="txtCurso"></label></td>
@@ -194,12 +256,26 @@ fecha = vid
        <td>Direcci&oacute;n :</td>
        <td><input id="txLugar" name="txLugar" type="text" tabindex="11" maxlength="50" size="30"/></td>
      </tr>
+	 <tr>
+	  <td id="tdLabTipoVa">Tipo de Cobro:</td>
+		<td id="tdTipoValor">
+		<Select id="selectTValor" name="selectTValor" tabindex="12"  size="1" onchange="MostrarValorUF()">
+		<option value="0" selected>Pesos</option>
+		<Option value="1">UF </option>
+		</select> </td>
+		<td>
+		 <td id="tdlabTipoVaUF" style="display:none">Cantidad UF:</td>
+		 <td><input id="txtValUF" name="txtValUF" type="text" tabindex="12" maxlength="50" size="12" value="0" style="display:none" onchange="CalcularPrecioUF()" /></td>
+		<td>
+	 </tr>
      <tr>
        <td><label id="labValor" name="labValor">Valor :</label></td>
        <td><label id="txtValor" name="txtValor">&nbsp;</label></td>
        <td>&nbsp;</td>       
        <td id="tdLabValEsp">Valor Especial:</td>
-       <td id="tdValEsp"><input id="txtValEsp" name="txtValEsp" type="text" tabindex="12" maxlength="50" size="12"/></td>  		       <td id="tdLabValTot">Monto Total:</td>
+       <td id="tdValEsp"><input id="txtValEsp" name="txtValEsp" type="text" tabindex="12" maxlength="50" size="12"/></td> 
+	   
+	  
        <td id="tdValTot"><input id="txtValTot" name="txtValTot" type="text" tabindex="12" maxlength="50" size="12"/></td>   
      </tr>
       <tr>

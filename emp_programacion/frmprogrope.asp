@@ -24,7 +24,8 @@ fecha = fecha&right("0"&hour(now()),2)&right("0"&minute(now()),2)&right("0"&seco
 dim query
 
 query="select dbo.MayMinTexto(CURRICULO.NOMBRE_CURSO) as NOMBRE_CURSO,CURRICULO.SENCE,CURRICULO.CODIGO,"
-query= query&"PROGRAMA.VALOR_ESPECIAL as VALOR,CURRICULO.ID_MUTUAL,CONVERT(VARCHAR(10),PROGRAMA.FECHA_INICIO_, 105) as FECHA_INICIO_, "
+query= query&" valor_especial as VALOR "
+query = query&" ,CURRICULO.ID_MUTUAL,CONVERT(VARCHAR(10),PROGRAMA.FECHA_INICIO_, 105) as FECHA_INICIO_, "
 query= query&" CONVERT(VARCHAR(10),PROGRAMA.FECHA_TERMINO, 105) as FECHA_TERMINO,PROGRAMA.ID_PROGRAMA "
 query= query&" from PROGRAMA "
 query= query&" inner join CURRICULO on CURRICULO.ID_MUTUAL=PROGRAMA.ID_MUTUAL "

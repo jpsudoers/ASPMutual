@@ -2,11 +2,12 @@
 <%
 Response.CodePage = 65001
 Response.CharSet = "utf-8"
-Response.ContentType="text/xml"
+'Response.ContentType="text/xml"
 Response.Write("<?xml version='1.0' encoding='UTF-8'?>")
 Response.Write("<modificar>") 
 
 on error resume next
+
 vId  = Request("txtId")
 vcurriculo = Request("Curriculo")
 vsence=Request("Sence")
@@ -15,6 +16,11 @@ vfechapertura=Request("txtFechApertura")
 vfechcierre=Request("txtFechCierre")
 vfechinicio=Request("txtFechInicio")
 vfechtermino=Request("txtFechTermino")
+vTipoValor = Request("selectTValor")
+vUF = Request("txtValUF")
+valorUFDiaria(Request("txtVlUfActual"))
+
+valorTotal = valorUFDiaria * vUF
 
 vcupo=Request("txtCupo")
 vinscritos=Request("txtInscritos")
@@ -35,7 +41,7 @@ end if
 if(Request("txtValEsp")<>"")then
 vvalesp="'"&Request("txtValEsp")&"'"
 else
-vvalesp="NULL"
+vvalesp=valorTotal
 end if
 
 if(Request("txtValTot")<>"")then
@@ -64,11 +70,10 @@ vtxtIDModalidad=Request("txtIDModalidad")
 query = "UPDATE PROGRAMA SET ID_MUTUAL='"&vcurriculo&"', SENCE='"&vsence&"',TIPO='"&vtipo&"',"
 query = query&"FECHA_APERTURA=CONVERT(datetime,'"&vfechapertura&"',105),FECHA_CIERRE=CONVERT(datetime,'"&vfechcierre&"',105), "
 query = query&"FECHA_INICIO_=CONVERT(datetime,'"&vfechinicio&"',105),FECHA_TERMINO=CONVERT(datetime,'"&vfechtermino&"',105), "
-query = query&"CUPOS='"&vcupo&"', INSCRITOS='"&vinscritos&"', VACANTES='"&vvacantes&"', ID_EMPRESA="&vid_empresa&", "
+query = query&"CUPOS='"&vcupo&"', INSCRITOS='"&vinscritos&"', VACANTES='"&vvacantes&"', ID_EMPRESA="&vid_empresa&", tipoValor="&vTipoValor&" , ValorUF="&vUF&" , "
 query = query&"DIR_EJEC="&vtxlugar&", VALOR_ESPECIAL="&vvalesp&", MONTO_TOTAL="&vvaltot&", BMI="&vtxtBMInicio&", BTF="&vtxtBTFin&", ID_Modalidad="&vtxtIDModalidad&", ID_ZOOM="&vtxtIDZoom&"  WHERE ID_PROGRAMA = '"&vid&"'"
 
-'response.Write(query)
-'response.End()
+
 
 conn.execute (query)
 

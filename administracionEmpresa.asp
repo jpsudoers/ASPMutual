@@ -514,27 +514,19 @@ tabla();
 		}
 	}
 	*/
-	function envioPass(contacto)
+	function envioPass()
 	{
-		if($("#frmEmpresa").valid())
+		if($("#frmAgregarUsuario").valid())
 		{
-			$.post($('#frmEmpresa').attr('action')+'?'+$('#frmEmpresa').serialize(),function(d){
+			$.post($('#frmAgregarUsuario').attr('action')+'?'+$('#frmAgregarUsuario').serialize(),function(d){
 			   																				 
 																						   });
-			if(contacto=='1')
-			{
 				rutEmpresa = $('#txRut').val();
 				nomUser = $('#txtNomb').val(); 
 				correoUser = $('#txtMail').val(); 
 				passUser = $('#txtPassCord').val();
-			}
-			else
-			{
-				rutEmpresa = $('#txRut').val();
-				nomUser = $('#txtNombConta').val(); 
-				correoUser = $('#txtMailConta').val(); 
-				passUser = $('#txtPassConta').val();
-			}
+
+			
 			
 			$('#dialog_espera').dialog('open');
 $.post("empresa/EnvioContrasena.asp",{rutEmpresa:rutEmpresa,nomUser:nomUser,correoUser:correoUser,passUser:passUser},function(d){

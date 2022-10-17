@@ -16,7 +16,7 @@ dim valor_curso
 	'if(rs("MUTUAL")="807")then
 		'valor_curso="CURRICULO.VALOR_AFILIADOS as VALOR"
 	'else
-		valor_curso="PROGRAMA.VALOR_ESPECIAL as VALOR"	
+		valor_curso=" (CASE WHEN PROGRAMA.tipoValor = 0 then PROGRAMA.VALOR_ESPECIAL else  round(PROGRAMA.VALOR_ESPECIAL * (select top 1 ValorUF from UF_Diaria where day(FechaValor) = day(getdate() -1) and month(FechaValor) = month(getdate()) and year(FechaValor) = year(getdate())),0) end) as VALOR"	
 	'end if
 
 dim query
@@ -26,10 +26,11 @@ query= query&" CONVERT(VARCHAR(10),PROGRAMA.FECHA_INICIO_, 105) as FECHA_INICIO_
 query= query&" CONVERT(VARCHAR(10),PROGRAMA.FECHA_TERMINO, 105) as FECHA_TERMINO,PROGRAMA.ID_PROGRAMA, "
 query= query&"(select top 1 (CASE WHEN S.ID_SEDE =  27 THEN bq.nom_sede WHEN S.ID_SEDE <>  27 THEN "
 query= query&"S.DIRECCION+', '+S.CIUDAD END) from bloque_programacion bq inner join SEDES s on s.ID_SEDE=bq.id_sede "
-query= query&" where CONVERT(bigint,bq.id_programa)=PROGRAMA.ID_PROGRAMA order by bq.id_bloque asc) as sede "
+query= query&" where CONVERT(bigint,bq.id_programa)=PROGRAMA.ID_PROGRAMA order by bq.id_bloque asc) as sede  "
 query= query&" from PROGRAMA "
 query= query&" inner join CURRICULO on CURRICULO.ID_MUTUAL=PROGRAMA.ID_MUTUAL "
 query= query&" where PROGRAMA.ID_PROGRAMA="&vid
+
 
 set rsEmp = conn.execute (query)
 

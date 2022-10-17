@@ -1,4 +1,5 @@
 <!--#include file="../cnn_string.asp"-->
+<!--#include file="../conexion.asp"-->
 <%
 Response.ContentType = "text/xml"
 Response.AddHeader "Cache-control", "private"
@@ -46,6 +47,9 @@ sql = sql&" and PROGRAMA.FECHA_CIERRE>=CONVERT(date,GETDATE(), 105) "
 sql = sql&" and (PROGRAMA.CUPOS - (select COUNT(HISTORICO_CURSOS.ID_PROGRAMA) from HISTORICO_CURSOS "
 sql = sql&" where HISTORICO_CURSOS.ID_PROGRAMA=PROGRAMA.ID_PROGRAMA)) > 0  AND TIPO=2  " 
 sql = sql&" ORDER BY "&columna&" "&orden
+
+
+
 
 DATOS.Open sql,oConn
 'total_pages = 0

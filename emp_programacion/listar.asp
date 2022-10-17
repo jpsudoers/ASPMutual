@@ -1,4 +1,5 @@
 <!--#include file="../cnn_string.asp"-->
+
 <%
 Response.ContentType = "text/xml"
 Response.AddHeader "Cache-control", "private"

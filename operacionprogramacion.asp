@@ -1052,6 +1052,40 @@ $(document).ready(function(){
 			$('#txtIDModalidad').val("0");
 		}
 	}
+	function MostrarValorUF()
+	{
+		console.log($("#selectTValor option:selected").val());
+		if($("#selectTValor option:selected").val() == "1"){
+
+			
+			$("#tdlabTipoVaUF").css("display","block");
+			$("#txtValUF").css("display","block");
+			//$("#ContentUF").css("display","block");.prop('readonly', false);
+			//$("#txtValEsp").attr("readonly");
+			$("#txtValEsp").attr("readOnly", true);
+
+		}
+		else
+		{
+			$("#tdlabTipoVaUF").css("display","none");
+			$("#txtValUF").css("display","none");
+			$("#txtValEsp").attr("readOnly", false);
+			//$("#txtValEsp").removeAttr("readonly");
+			//$("#txtValEsp").removeClass("readOnly");
+		}
+	}
+	function CalcularPrecioUF(){
+		if($("#selectTValor option:selected").val() == "1"){
+			$("#txtValEsp").attr("readOnly", true);
+			var valorconpunto = $("#txtValUF").val().replace(",",".");
+			$("#txtValUF").val(valorconpunto);
+			var valortotal = parseFloat($("#txtValUF").val().replace(",",".")) * parseFloat($("#txtVlUfActual").val());
+			console.log(valortotal);
+			$("#txtValEsp").val(valortotal);
+
+		}
+		
+	}
 	</script>
 </head>
 <body>

@@ -17,6 +17,8 @@ vcupo=Request("txtCupo")
 vinscritos=Request("txtInscritos")
 vvacantes=Request("txtVacantes")
 vprogId=Request("tabFecha")
+vTipoValor = Request("selectTValor")
+vUF = Request("txtValUF")
 
 if(Request("id_empresa")<>"")then
 vid_empresa=Request("id_empresa")
@@ -62,11 +64,11 @@ vtxtIDModalidad=Request("txtIDModalidad")
 dim query
 query = "IF EXISTS (select * from bloque_programacion bp where bp.id_programa='"&vprogId&"') BEGIN "
 query = query&"insert into PROGRAMA (ID_MUTUAL,SENCE,TIPO,FECHA_APERTURA,FECHA_CIERRE"
-query = query&",FECHA_INICIO_,FECHA_TERMINO,CUPOS,INSCRITOS,VACANTES,ESTADO,VIGENCIA,ID_EMPRESA,DIR_EJEC,VALOR_ESPECIAL,MONTO_TOTAL,BMI,BMF,BTI,BTF,ID_Modalidad,ID_ZOOM) "
+query = query&",FECHA_INICIO_,FECHA_TERMINO,CUPOS,INSCRITOS,VACANTES,ESTADO,VIGENCIA,ID_EMPRESA,DIR_EJEC,VALOR_ESPECIAL,MONTO_TOTAL,BMI,BMF,BTI,BTF,ID_Modalidad,ID_ZOOM, tipoValor, ValorUF) "
 query = query&" values('"&vcurriculo&"','"&vsence&"','"&vtipo&"',CONVERT(datetime,'"&vfechapertura&"',105)"
 query = query&",CONVERT(datetime,'"&vfechcierre&"',105),CONVERT(datetime,'"&vfechinicio&"',105),"
 query = query&"CONVERT(datetime,'"&vfechtermino&"',105),'"&vcupo&"',0,'"&vvacantes&"',1,1"
-query = query&","&vid_empresa&","&vtxlugar&","&vvalesp&","&vvaltot&","&vtxtBMInicio&",Null,Null,"&vtxtBTFin&","&vtxtIDModalidad&","&vtxtIDZoom&") END "
+query = query&","&vid_empresa&","&vtxlugar&","&vvalesp&","&vvaltot&","&vtxtBMInicio&",Null,Null,"&vtxtBTFin&","&vtxtIDModalidad&","&vtxtIDZoom&","&vTipoValor&","&vUF&") END "
 
 'response.Write(query)
 'response.End()
