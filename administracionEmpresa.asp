@@ -555,19 +555,21 @@ $.post("empresa/EnvioContrasena.asp",{rutEmpresa:rutEmpresa,nomUser:nomUser,corr
 	}*/
 	
 	function MuestraRef(){
-		$('#lbl1').hide();
-		$('#lbl2').hide();
-		$('#lblHES').hide();
-		$('#lblMIGO').hide();
-		$('#lbl5').hide();
+		
+		console.log("llego");
 
 		if($('#cond_oc').attr("checked"))
 		{
-			$('#lbl1').show();
-			$('#lbl2').show();
-			$('#lblHES').show();
-			$('#lblMIGO').show();
-			$('#lbl5').show();
+			$('#filaRef').css("display","block");
+			$('#lblHES').css("display","block");
+			$('#lblMIGO').css("display","block");
+			console.log("block");
+		}
+		else{
+			$('#filaRef').css("display","none");
+			$('#lblHES').css("display","none");
+			$('#lblMIGO').css("display","none");
+			console.log("none");
 		}
 	}
 	
